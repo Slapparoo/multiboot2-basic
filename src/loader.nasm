@@ -16,11 +16,14 @@
 ;
 use32
 global loader
+extern kernelMain
+
 
 %include "multiboot2.inc"
 
 ;  The size of our stack (16KB). 
 %define STACK_SIZE                      0x4000
+; Prefer explicate declarations
 %define u8      db    
 %define u16     dw    
 %define u32     dd    
@@ -32,10 +35,10 @@ section .text
 
 
 multiboot_header:
-        u32      MULTIBOOT2_HEADER_MAGIC
-        u32   MULTIBOOT_ARCHITECTURE_I386
-        u32   multiboot_header_end - multiboot_header
-        u32   -(MULTIBOOT2_HEADER_MAGIC + MULTIBOOT_ARCHITECTURE_I386 + (multiboot_header_end - multiboot_header))
+        u32 MULTIBOOT2_HEADER_MAGIC
+        u32 MULTIBOOT_ARCHITECTURE_I386
+        u32 multiboot_header_end - multiboot_header
+        u32 -(MULTIBOOT2_HEADER_MAGIC + MULTIBOOT_ARCHITECTURE_I386 + (multiboot_header_end - multiboot_header))
 
 ; framebuffer_tag_start:  
 ;         u16 MULTIBOOT_HEADER_TAG_FRAMEBUFFER
@@ -50,17 +53,17 @@ address_tag_start:
         u16 MULTIBOOT_HEADER_TAG_ADDRESS
         u16 MULTIBOOT_HEADER_TAG_OPTIONAL
         u32 address_tag_end - address_tag_start
-        u32   multiboot_header
-        u32   _start
-        u32   _edata
-        u32   _end
+        u32 multiboot_header
+        u32 loader
+        u32 _edata
+        u32 kernel_stack
 address_tag_end:
 
 entry_address_tag_start:        
         u16 MULTIBOOT_HEADER_TAG_ENTRY_ADDRESS
         u16 MULTIBOOT_HEADER_TAG_OPTIONAL
         u32 entry_address_tag_end - entry_address_tag_start
-        u32 multiboot_entry
+        u32 loader
 entry_address_tag_end:
 
         u16 MULTIBOOT_HEADER_TAG_END
@@ -70,16 +73,13 @@ entry_address_tag_end:
 
 multiboot_header_end:
 
-; section .text
-extern kernelMain
+; .. other vars here
 
-multiboot_entry:
-_start:
 loader:
         lea    esp, kernel_stack
 
 ;          Reset EFLAGS.
-        push   $0
+        push   0
         popf
 
         ; Now enter the C main function...
@@ -93,7 +93,7 @@ section .bss
         ; stack space
         resb STACK_SIZE
 kernel_stack:
-_end:
+
 
 section .data
 _edata:
