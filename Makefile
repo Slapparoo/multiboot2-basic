@@ -1,6 +1,5 @@
 
-# sudo apt-get install g++ binutils libc6-dev-i386
-# sudo apt-get install VirtualBox grub-legacy xorriso
+# sudo apt-get install gcc binutils libc6-dev-i386 qemu grub-legacy xorriso
 
 GCCPARAMS =  -Iinclude -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wno-write-strings -O1
 
